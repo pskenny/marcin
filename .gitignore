@@ -55,3 +55,6 @@ target/
 .scala_dependencies
 .worksheet
 
+# IDE files
+.classpath
+.project
