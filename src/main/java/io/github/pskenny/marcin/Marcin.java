@@ -19,19 +19,20 @@ import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 
 import io.github.pskenny.marcin.io.*;
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
 
-public class Test {
+public class Marcin {
 
 	public static final FieldKey[] DEFAULT_KEYS = { FieldKey.ARTIST, FieldKey.ALBUM, FieldKey.TITLE };
-	public static final String DEFAULT_MUSIC_DIRECTORY = System.getProperty("user.home")
-			+ System.getProperty("file.separator") + "Music";
+	private final String DEFAULT_MUSIC_DIRECTORY;
 
-	public Test() {
+	public Marcin(String dir) {
+		DEFAULT_MUSIC_DIRECTORY = dir;
 		long time = System.nanoTime();
-		HashSet<File> all = Utility
-				.listFiles(System.getProperty("user.home") + System.getProperty("file.separator") + "Music");
-		Stream<File> files = all.parallelStream().filter(file -> file.isFile());
-		Stream<File> dirs = all.parallelStream().filter(file -> file.isDirectory());
+		HashSet<File> all = Utility.listFiles(dir);
+		Stream<File> files = all.parallelStream().filter(file -> file.isFile() && Utility.hasAudioExtension(file));
+		//Stream<File> dirs = all.parallelStream().filter(file -> file.isDirectory());
 
 		files.forEach(file -> compareGeneratedPaths(file));
 
@@ -44,6 +45,7 @@ public class Test {
 
 			String generated = generatePath(file, DEFAULT_MUSIC_DIRECTORY, DEFAULT_KEYS);
 			if (!original.contentEquals(generated)) {
+				System.out.println("\n" + original + "\n" + generated);
 				// Move file to new path
 				// move(file, generated);
 			}
@@ -51,7 +53,6 @@ public class Test {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	private void move(File file, String newPath) {
@@ -126,7 +127,14 @@ public class Test {
 	}
 
 	public static void main(String[] args) {
-		new Test();
+		if (args.length == 0)
+			return;
+		// TODO Add -y automatic confirmation
+		ArgumentParser parser = ArgumentParsers.newFor("marcin").build()
+				.description("Paul's opinionated music cleaner.");
+
+		new Marcin(args[0]);
+
 	}
 
 }

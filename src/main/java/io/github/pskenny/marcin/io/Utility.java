@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.HashSet;
 
 public class Utility {
+	public static final String[] AUDIO_EXTENSIONS = { ".mp3", ".ogg", ".wav", ".aac", ".wma", ".flac", ".m4a", ".mp4" };
+	
 	public static HashSet<File> listFiles(File dir) {
 		HashSet<File> files = new HashSet<File>();
 
@@ -53,8 +55,7 @@ public class Utility {
 	}
 	
 	public static String makeValidPath(String path) {
-		// Naive way coming up ahead
-		// TODO remove all . except for the file extension one
+		// Naive:
 		final String[] notValid = { "\"", "<", ">", "!", "\\?", ":", ";", "\\", "\\*", "|", "$" , "/"};
 		
 		for (String s : notValid) {
@@ -62,5 +63,15 @@ public class Utility {
 				path = path.replaceAll(s, "");
 		}
 		return path;
+	}
+	
+	public static boolean hasAudioExtension(File file) {
+		final String filename = file.getName();
+
+		for (String extension : AUDIO_EXTENSIONS) {
+			if (filename.toLowerCase().endsWith(extension))
+				return true;
+		}
+		return false;
 	}
 }
