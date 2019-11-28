@@ -32,7 +32,7 @@ public class Marcin {
 	public Marcin(String dir) {
 		DEFAULT_MUSIC_DIRECTORY = dir;
 		long time = System.nanoTime();
-		HashSet<File> all = Utility.listFiles(dir);
+		HashSet<File> all = Utility.listFiles(new File(dir));
 		Stream<File> files = all.parallelStream().filter(file -> file.isFile() && Utility.hasAudioExtension(file));
 		//Stream<File> dirs = all.parallelStream().filter(file -> file.isDirectory());
 
