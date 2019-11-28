@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
@@ -125,6 +127,15 @@ public class Marcin {
 			}
 		}
 	}
+	
+	// Disable Jaudiotagger logging, see https://stackoverflow.com/questions/50778442/how-to-disable-jaudiotagger-logger-completely
+	static {
+        //Disable loggers               
+        Logger[] pin = new Logger[]{ Logger.getLogger("org.jaudiotagger") };
+
+        for (Logger l : pin)
+            l.setLevel(Level.OFF);
+    }
 
 	public static void main(String[] args) {
 		if (args.length == 0)
