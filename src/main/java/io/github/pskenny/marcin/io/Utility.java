@@ -1,11 +1,19 @@
 package io.github.pskenny.marcin.io;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
 
+import org.apache.commons.io.FilenameUtils;
+
 public class Utility {
-	public static final String[] AUDIO_EXTENSIONS = { ".mp3", ".ogg", ".wav", ".aac", ".wma", ".flac", ".m4a", ".mp4" };
-	
+	// File extensions from https://en.wikipedia.org/wiki/Audio_file_format
+	public static final HashSet<String> AUDIO_EXTENSIONS = new HashSet<String>(
+			Arrays.asList("3gp", "8svx", "aa", "aac", "aax", "aax", "act", "aiff", "alac", "amr", "ape",
+					"au", "awb", "cda", "dct.", "dss", "dvf", "flac", "gsm", "iklax", "ivs", "m4a", "m4b",
+					"m4p", "mmf", "mp3", "mpc", "msv", "nmf", "nsf", "ogg", "oga", "mogg", "opus", "ra",
+					"rm", "raw", "rf64", "sln", "tta", "voc", "vox", "wav", "wma", "wv", "webm"));
+
 	public static HashSet<File> listFiles(File dir) {
 		HashSet<File> files = new HashSet<File>();
 
@@ -49,12 +57,8 @@ public class Utility {
 	}
 	
 	public static boolean hasAudioExtension(File file) {
-		final String filename = file.getName();
+		String extension = FilenameUtils.getExtension(file.getName());
 
-		for (String extension : AUDIO_EXTENSIONS) {
-			if (filename.toLowerCase().endsWith(extension))
-				return true;
-		}
-		return false;
+		return AUDIO_EXTENSIONS.contains(extension);
 	}
 }
