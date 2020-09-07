@@ -13,6 +13,10 @@ public class Utility {
 					"au", "awb", "cda", "dct.", "dss", "dvf", "flac", "gsm", "iklax", "ivs", "m4a", "m4b",
 					"m4p", "mmf", "mp3", "mpc", "msv", "nmf", "nsf", "ogg", "oga", "mogg", "opus", "ra",
 					"rm", "raw", "rf64", "sln", "tta", "voc", "vox", "wav", "wma", "wv", "webm"));
+	/* Invalid characters/filenames:
+	https://docs.microsoft.com/en-gb/windows/win32/fileio/naming-a-file?redirectedfrom=MSDN
+	https://en.wikipedia.org/wiki/Ext3 */
+	private static final String[] INVALID_CHARACTERS = { "\"", "<", ">", "!", "\\?", ":", ";", "\\", "\\*", "|", "$" , "/"};
 
 	public static HashSet<File> listFiles(File dir) {
 		HashSet<File> files = new HashSet<File>();
@@ -46,11 +50,10 @@ public class Utility {
 	}
 	
 	public static String makeValidPath(String path) {
-		// Naive:
-		final String[] notValid = { "\"", "<", ">", "!", "\\?", ":", ";", "\\", "\\*", "|", "$" , "/"};
-		
-		for (String s : notValid) {
+		// Check if each invalid character is in the path
+		for (String s : INVALID_CHARACTERS) {
 			if (path.contains(s))
+				// remove character from file
 				path = path.replaceAll(s, "");
 		}
 		return path;
