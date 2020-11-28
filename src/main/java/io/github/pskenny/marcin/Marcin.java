@@ -27,27 +27,25 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 public class Marcin {
 
 	public static final FieldKey[] DEFAULT_KEYS = { FieldKey.ARTIST, FieldKey.ALBUM, FieldKey.TITLE };
+	private final String fileSeparator = System.getProperty("file.separator");
 	private final String DEFAULT_MUSIC_DIRECTORY;
 
 	public Marcin(String dir) {
 		DEFAULT_MUSIC_DIRECTORY = dir;
-		long time = System.nanoTime();
-		HashSet<File> all = Utility.listFiles(new File(dir));
+		HashSet<File> all = (HashSet<File>) Utility.listFiles(new File(dir));
 		Stream<File> files = all.parallelStream().filter(file -> file.isFile() && Utility.hasAudioExtension(file));
 		//Stream<File> dirs = all.parallelStream().filter(file -> file.isDirectory());
 
-		files.forEach(file -> compareGeneratedPaths(file));
-
-		System.out.println("Time: " + (System.nanoTime() - time) / 1000000000d);
+		files.forEach(this::compareGeneratedPaths);
 	}
 
 	public void compareGeneratedPaths(File file) {
 		try {
-			String original = file.getCanonicalPath();
+			String originalFileName = file.getCanonicalPath();
 
-			String generated = generatePath(file, DEFAULT_MUSIC_DIRECTORY, DEFAULT_KEYS);
-			if (!original.contentEquals(generated)) {
-				System.out.println("\n" + original + "\n" + generated);
+			String generatedFileName = generatePath(file, DEFAULT_MUSIC_DIRECTORY, DEFAULT_KEYS);
+			if (!originalFileName.contentEquals(generatedFileName)) {
+				System.out.println("\n" + originalFileName + "\n" + generatedFileName);
 				// Move file to new path
 				// move(file, generated);
 			}
@@ -77,10 +75,10 @@ public class Marcin {
 	public String generatePath(File file, String basePath, FieldKey[] keys) {
 		StringBuilder sb = new StringBuilder();
 
-		AudioFile f;
+		AudioFile audioFile;
 		try {
-			f = AudioFileIO.read(file);
-			Tag tag = f.getTag();
+			audioFile = AudioFileIO.read(file);
+			Tag tag = audioFile.getTag();
 
 			// NOTE: Seems to take tag info from ID3v2.4.0 and not ID3v1.1
 			for (FieldKey key : keys) {
@@ -89,7 +87,7 @@ public class Marcin {
 					String tagKey = tag.getFirst(key);
 					if (tagKey.isEmpty())
 						continue;
-					sb.append(System.getProperty("file.separator"));
+					sb.append(fileSeparator);
 					sb.append(Utility.makeValidPath(tagKey));
 				} catch (KeyNotFoundException kex) {
 
@@ -100,7 +98,7 @@ public class Marcin {
 
 			// no tags found, give it a unique name
 			if (sb.length() == 0) {
-				sb.append(System.getProperty("file.separator"));
+				sb.append(fileSeparator);
 				sb.append(uniqueFileName(file.getParentFile(), extension));
 			}
 			sb.insert(0, basePath);
@@ -119,7 +117,7 @@ public class Marcin {
 
 		while (true) {
 			File newFile = new File(
-					dir.getCanonicalPath() + System.getProperty("file.separator") + defaultName + number + extension);
+					dir.getCanonicalPath() + fileSeparator + defaultName + number + extension);
 			if (newFile.exists()) {
 				number++;
 			} else {
